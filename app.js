@@ -187,7 +187,7 @@ function parseURL(url = '') {
             hash: urlObj.hash,
             username: urlObj.username,
             password: urlObj.password,
-            queryParams: parseParams(urlObj.search, true)
+            queryParams: urlObj.search && parseParams(urlObj.search, true)
         }
         Object.keys(result).map(key => {
             if (!result[key]) result[key] = undefined;
