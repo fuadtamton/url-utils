@@ -99,8 +99,8 @@ input[type="text"],
 input[type="submit"],
 input[type="button"] {
     padding: var(--m-margin);
-    border: none;
     font-size: var(--l-font);
+    border: none;
 }
 
 .btn {
@@ -147,6 +147,9 @@ form input {
 
 form button {
     border-radius: 0 4px 4px 0 !important;
+    padding: var(--m-margin);
+    font-size: var(--l-font);
+    border: none;
 }
 
 .result {

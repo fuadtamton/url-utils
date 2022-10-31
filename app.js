@@ -6,6 +6,7 @@ const FormMeta = {
         h1: 'Encode URL',
         input: {
             placeholder: 'Enter/Paste URL',
+            btnText: 'Encode'
         },
         result: {
             title: 'Encoded URL'
@@ -17,6 +18,7 @@ const FormMeta = {
         h1: 'Decode URL',
         input: {
             placeholder: 'Enter/Paste URL',
+            btnText: 'Decode'
         },
         result: {
             title: 'Decoded URL'
@@ -28,6 +30,7 @@ const FormMeta = {
         h1: 'Parse Query Params',
         input: {
             placeholder: 'Enter/Paste URL',
+            btnText: 'Parse'
         },
         result: {
             title: 'Result'
@@ -39,6 +42,7 @@ const FormMeta = {
         h1: 'Parse URL',
         input: {
             placeholder: 'Enter/Paste URL',
+            btnText: 'Parse'
         },
         result: {
             title: 'Result'
@@ -147,6 +151,7 @@ function setActiveFormType(formType) {
     if (config) {
         document.title = config.title;
         $('h1').html(config.h1);
+        $('form button').html(config.input.btnText);
         $('.result label').html(config.result.title);
         $('#user-input').prop('placeholder', config.input.placeholder);
         $('html, body').animate({ scrollTop: 0 }, 'slow');
