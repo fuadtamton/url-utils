@@ -1,11 +1,51 @@
-/* todo - 
-    url encoder
-    url decoder
-    query params parser
-    url parser -> domain, prototype, path
-
-*/
 let result = '';
+
+const FormMeta = {
+    'encode-url': {
+        title: 'Encode URL | URL Utils',
+        h1: 'Encode URL',
+        input: {
+            placeholder: 'Enter/Paste URL',
+        },
+        result: {
+            title: 'Encoded URL'
+        },
+        generateResult: encodeURI
+    },
+    'decode-url': {
+        title: 'Decode URL | URL Utils',
+        h1: 'Decode URL',
+        input: {
+            placeholder: 'Enter/Paste URL',
+        },
+        result: {
+            title: 'Decoded URL'
+        },
+        generateResult: decodeURI
+    },
+    'parse-params': {
+        title: 'Parse Query Params | URL Utils',
+        h1: 'Parse Query Params',
+        input: {
+            placeholder: 'Enter/Paste URL',
+        },
+        result: {
+            title: 'Result'
+        },
+        generateResult: parseParams
+    },
+    'parse-url': {
+        title: 'Parse URL | URL Utils',
+        h1: 'Parse URL',
+        input: {
+            placeholder: 'Enter/Paste URL',
+        },
+        result: {
+            title: 'Result'
+        },
+        generateResult: parseURL
+    },
+}
 
 function onLoadPage() {
     const theme = getUserTheme();
@@ -15,11 +55,6 @@ function onLoadPage() {
     setActiveFormType(getFormType());
 
     $('#more-tools li').click(setActiveForm);
-}
-
-function openForm() {
-    const formType = getFormType();
-
 }
 
 function toggleTheme(theme) {
@@ -38,12 +73,14 @@ function toggleTheme(theme) {
 
 function onSubmitForm(event) {
     event.preventDefault();
-    const url = $('#user-input').val().trim();
-    // const formType = getFormType();
-    const encoded = encodeURIComponent(url);
-    $('#result').html(encoded);
-    result = encoded;
-    $('.result').show('fast');
+    const formType = getFormType();
+    const config = FormMeta[formType];
+    if (config) {
+        const input = $('#user-input').val().trim();
+        const result = config.generateResult(input);
+        $('#result').html(result);
+        $('.result').show('fast');
+    }
 }
 
 function copyResult() {
@@ -74,7 +111,8 @@ function copyResult() {
 }
 
 function getFormType() {
-    return $('body').attr('form-type');
+    const formType = parseParams(window.location.search, true).ft;
+    return formType || $('body').attr('form-type');
 };
 
 
@@ -88,7 +126,6 @@ function setActiveForm(event) {
     const newType = event.target.id.split('link-')[1];
     if (newType !== getFormType()) {
         setActiveFormType(newType);
-        openForm(newType);
     }
 }
 
@@ -99,5 +136,64 @@ function setActiveFormType(formType) {
     if (history.pushState) {
         var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?ft=' + formType;
         window.history.pushState({ path: newurl }, '', newurl);
+    }
+    $('.result').hide('fast');
+    $('#user-input').val('');
+    setTimeout(() => {
+        $('#result').html('');
+    }, 500);
+
+    const config = FormMeta[formType];
+    if (config) {
+        document.title = config.title;
+        $('h1').html(config.h1);
+        $('.result label').html(config.result.title);
+        $('#user-input').prop('placeholder', config.input.placeholder);
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
+    }
+}
+
+function parseParams(param = '', jsonOutput = false) {
+    if (param.includes('?')) param = '?' + param.split('?')[1];
+    usp = new URLSearchParams(param);
+    const keys = usp.keys();
+    const result = {};
+    for (const key of keys) {
+        if (!result[key]) {
+            result[key] = usp.getAll(key);
+        } else {
+            result[key] = [...result[key], ...usp.getAll(key)]
+        }
+    }
+    for (const key in result) {
+        const element = result[key];
+        result[key] = Array(...new Set(element));
+        if (result[key].length <= 1) result[key] = result[key][0];
+    }
+    if (jsonOutput) return result;
+    return JSON.stringify(result, null, 4);
+}
+
+
+function parseURL(url = '') {
+    try {
+        const urlObj = new URL(url);
+        const result = {
+            protocol: urlObj.protocol,
+            hostname: urlObj.hostname,
+            origin: urlObj.origin,
+            pathname: urlObj.pathname,
+            port: urlObj.port,
+            hash: urlObj.hash,
+            username: urlObj.username,
+            password: urlObj.password,
+            queryParams: parseParams(urlObj.search, true)
+        }
+        Object.keys(result).map(key => {
+            if (!result[key]) result[key] = undefined;
+        });
+        return JSON.stringify(result, null, 2);
+    } catch {
+
     }
 }
